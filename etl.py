@@ -4,12 +4,28 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    Load data from S3 to staging tables on Redshift
+    
+    Args:
+        cur: cursor object to execute PostgreSQL command through Python
+        conn: connection to database
+    """
+
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    Load data from staging tables to analytics tables on Redshift.
+    
+    Args:
+        cur: cursor object to execute PostgreSQL command through Python
+        conn: connection to database
+    """
+    
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()

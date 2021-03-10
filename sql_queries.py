@@ -19,91 +19,100 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 staging_events_table_create= ("""
 CREATE TABLE IF NOT EXISTS staging_events(
-    event_id integer IDENTITY(0,1) PRIMARY KEY,
-    artist varchar,
-    auth varchar,
-    firstName varchar,
-    gender varchar,
-    itemInSession integer,
-    lastName varchar,
-    length double precision,
-    level varchar,
-    location varchar,
-    method varchar,
-    page varchar,
-    registration double precision,
-    sessionId integer,
-    song varchar,
-    status integer,
-    ts bigint,
-    userAgent varchar,
-    userId varchar);
+    event_id INT IDENTITY(0,1) PRIMARY KEY,
+    artist VARCHAR(max),
+    auth VARCHAR(max),
+    firstName VARCHAR(max),
+    gender CHAR(1),
+    itemInSession INT,
+    lastName VARCHAR(max),
+    length DOUBLE PRECISION,
+    level VARCHAR(max),
+    location VARCHAR(max),
+    method VARCHAR(max),
+    page VARCHAR(300),
+    registration DOUBLE PRECISION,
+    sessionId INT,
+    song VARCHAR(max),
+    status INT,
+    ts BIGINT,
+    userAgent VARCHAR(max),
+    userId VARCHAR(max));
 """)
 
 staging_songs_table_create = ("""
 CREATE TABLE IF NOT EXISTS staging_songs(
-    artist_id varchar, 
-    artist_latitude double precision,
-    artist_location varchar,
-    artist_longitude double precision,
-    artist_name varchar,
-    duration double precision,
-    num_songs integer,
-    song_id varchar,
-    title varchar,
-    year integer
+    artist_id VARCHAR(max), 
+    artist_latitude DOUBLE PRECISION,
+    artist_location VARCHAR(max),
+    artist_longitude DOUBLE PRECISION,
+    artist_name VARCHAR(max),
+    duration DOUBLE PRECISION,
+    num_songs INT,
+    song_id VARCHAR(max),
+    title VARCHAR(max),
+    year INT4
     );
 """)
 
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplays (
-    songplay_id int IDENTITY(0,1) PRIMARY KEY NOT NULL, 
-    start_time timestamp NOT NULL, 
-    user_id varchar NOT NULL, 
-    level varchar, 
-    song_id varchar NOT NULL, 
-    artist_id varchar, 
+    songplay_id int IDENTITY(0,1) PRIMARY KEY, 
+    start_time TIMESTAMP, 
+    user_id VARCHAR(max) NOT NULL, 
+    level VARCHAR(max), 
+    song_id VARCHAR(max) NOT NULL, 
+    artist_id VARCHAR(max) NOT NULL, 
     session_id BIGINT NOT NULL, 
-    location varchar, 
-    user_agent varchar);
+    location VARCHAR(max), 
+    user_agent VARCHAR(max)
+    --FOREIGN KEY (start_time) REFERENCES time(start_time),
+    --FOREIGN KEY (user_id) REFERENCES users(user_id),
+    --FOREIGN KEY (song_id) REFERENCES songs(song_id),
+    --FOREIGN KEY (artist_id) REFERENCES artists(artist_id)
+    )
+    DISTKEY(song_id)
+    SORTKEY(start_time, session_id);
 """)
 
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users(
-    user_id varchar PRIMARY KEY NOT NULL,
-    first_name varchar,
-    last_name varchar,
-    gender varchar,
-    level varchar NOT NULL);
+    user_id VARCHAR(max) PRIMARY KEY,
+    first_name VARCHAR(max),
+    last_name VARCHAR(max),
+    gender CHAR(1),
+    level VARCHAR(max) NOT NULL);
 """)
 
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS songs(
-    song_id varchar PRIMARY KEY NOT NULL,
-    title varchar,
-    artist_id varchar NOT NULL,
-    year integer,
-    duration double precision);
+    song_id VARCHAR(max) PRIMARY KEY,
+    title VARCHAR(max),
+    artist_id VARCHAR(max) NOT NULL,
+    year INT4,
+    duration DOUBLE PRECISION)
+    DISTKEY(artist_id)
+    SORTKEY(song_id, year);
 """)
 
 artist_table_create = ("""
 CREATE TABLE artists(
-    artist_id varchar PRIMARY KEY NOT NULL,
-    name varchar,
-    location varchar,
-    latitude double precision,
-    longitude double precision);
+    artist_id VARCHAR(max) PRIMARY KEY,
+    name VARCHAR(max),
+    location VARCHAR(max),
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION);
 """)
 
 time_table_create = ("""
 CREATE TABLE time(
-    start_time timestamp PRIMARY KEY NOT NULL,
-    hour integer,
-    day integer,
-    week integer,
-    month integer,
-    year integer,
-    weekday integer);
+    start_time TIMESTAMP PRIMARY KEY,
+    hour INT,
+    day INT,
+    week INT,
+    month INT,
+    year INT4,
+    weekday INT);
 """)
 
 # STAGING TABLES
@@ -192,7 +201,7 @@ FROM songplays
 
 # QUERY LISTS
 
-create_table_queries = [staging_events_table_create, staging_songs_table_create, songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
+create_table_queries = [staging_events_table_create, staging_songs_table_create, user_table_create, song_table_create, artist_table_create, time_table_create, songplay_table_create]
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
 copy_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert, time_table_insert]
